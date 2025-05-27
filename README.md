@@ -12,7 +12,7 @@ Finstra is an AI-powered financial advisor that provides personalized financial 
 
 1. **Clone the Repository**
    ```bash
-   git clone <repository-url>
+   git clone "repo link"
    cd Finstra
    ```
 
@@ -36,18 +36,11 @@ Finstra is an AI-powered financial advisor that provides personalized financial 
 
 3. **Install Dependencies**
    ```bash
-   cd Finstra
    pip install -r requirements.txt
    ```
 
-   The virtual environment ensures that:
-   - All packages are installed in an isolated environment
-   - Different projects can use different versions of the same package
-   - Your system Python installation remains clean
-   - The project's dependencies are clearly defined and reproducible
-
 4. **Environment Setup**
-   - Create a `.env` file in the `backend` directory
+   - Create a `.env` file in the root directory (or copy from .env.example)
    - Add your Gemini API key:
      ```
      GEMINI_API_KEY=your_api_key_here
@@ -60,7 +53,7 @@ Finstra is an AI-powered financial advisor that provides personalized financial 
    - Ensure your virtual environment is activated (you should see `(venv)` in your prompt)
    - Navigate to the backend directory:
      ```bash
-     cd Finstra/backend
+     cd backend
      ```
    - Run the Flask server:
      ```bash
@@ -71,9 +64,9 @@ Finstra is an AI-powered financial advisor that provides personalized financial 
 2. **Start the Frontend Server**
    - Open a new terminal/command prompt
    - Activate the virtual environment in this terminal too
-   - Navigate to the frontend directory:
+   - Navigate to the frontend_cb directory:
      ```bash
-     cd Finstra/frontend
+     cd frontend_cb
      ```
    - Start the Python HTTP server:
      ```bash
@@ -85,6 +78,22 @@ Finstra is an AI-powered financial advisor that provides personalized financial 
    - Open your web browser
    - Go to `http://localhost:8000`
    - The chat interface should now be available
+
+## Note for Windows Users
+
+If using specific Python installation paths, use these commands:
+
+1. **Backend:**
+   ```cmd
+   cd backend
+   "C:\Users\Dell\AppData\Local\Programs\Python\Python313\python.exe" app.py
+   ```
+
+2. **Frontend:**
+   ```cmd
+   cd frontend_cb
+   "C:\Users\Dell\AppData\Local\Programs\Python\Python313\python.exe" -m http.server 8000
+   ```
 
 ## Features
 
@@ -99,7 +108,7 @@ Finstra is an AI-powered financial advisor that provides personalized financial 
 1. **Virtual Environment Issues**
    - Make sure you see `(venv)` in your terminal prompt
    - If not, activate the virtual environment again
-   - If packages are not found, ensure you're using the correct Python interpreter from the virtual environment
+   - If packages are not found, ensure you're using the correct Python interpreter
 
 2. **Backend Issues**
    - Ensure your Gemini API key is correctly set in the `.env` file
@@ -114,27 +123,6 @@ Finstra is an AI-powered financial advisor that provides personalized financial 
 4. **API Rate Limits**
    - The application includes retry mechanisms for API rate limits
    - If you encounter persistent 429 errors, wait a few minutes before retrying
-
-## Note for Windows Users
-
-If using specific Python installation paths, use the following commands:
-
-1. **Creating Virtual Environment:**
-   ```cmd
-   "C:\Users\[Username]\AppData\Local\Programs\Python\Python313\python.exe" -m venv venv
-   ```
-
-2. **Backend:**
-   ```cmd
-   "C:\Users\[Username]\AppData\Local\Programs\Python\Python313\python.exe" app.py
-   ```
-
-3. **Frontend:**
-   ```cmd
-   "C:\Users\[Username]\AppData\Local\Programs\Python\Python313\python.exe" -m http.server 8000
-   ```
-
-Replace `[Username]` with your Windows username.
 
 ## Support
 
