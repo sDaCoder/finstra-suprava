@@ -5,6 +5,7 @@ import os
 from dotenv import load_dotenv
 import traceback
 import time
+import re
 
 # Load environment variables
 load_dotenv()
@@ -20,12 +21,6 @@ else:
     print("API key loaded successfully")
 
 genai.configure(api_key=api_key)
-
-# # List available models and find a suitable one
-# print("Available models:")
-# available_models = list(genai.list_models())
-# for m in available_models:
-#     print(f"- {m.name}")
 
 # Initialize the model
 try:
@@ -56,6 +51,115 @@ Be encouraging and kind. Avoid jargon. Use examples from farming, livestock, or 
 Keep paragraphs short and use line breaks between sections for better readability.
 """
 
+# Scam detection patterns
+SCAM_PATTERNS = [
+    r'(?i)(send money|transfer.*urgently|lottery.*won|prince.*nigeria|inheritance.*claim)',
+    r'(?i)(click.*link|verify.*account.*immediately|suspended.*account)',
+    r'(?i)(give.*otp|share.*pin|tell.*password|bank.*details)',
+    r'(?i)(investment.*guaranteed|double.*money|risk.*free.*profit)',
+    r'(?i)(crypto.*mining|bitcoin.*investment|forex.*trading.*sure)'
+]
+
+# Proactive suggestions
+PROACTIVE_SUGGESTIONS = {
+    'savings': {
+        'english': [
+            "Would you like me to explain different types of savings accounts?",
+            "Should I help you create a monthly budget plan?",
+            "Would you like tips on reducing daily expenses?"
+        ],
+        'hindi': [
+            "क्या आप चाहेंगे कि मैं विभिन्न प्रकार के बचत खातों के बारे में बताऊं?",
+            "क्या मैं आपको मासिक बजट बनाने में मदद करूं?",
+            "क्या आप दैनिक खर्च कम करने के तरीके जानना चाहेंगे?"
+        ],
+        'bengali': [
+            "আপনি কি চান যে আমি বিভিন্ন ধরনের সেভিংস অ্যাকাউন্ট সম্পর্কে বলি?",
+            "আমি কি আপনাকে মাসিক বাজেট তৈরি করতে সাহায্য করব?",
+            "আপনি কি দৈনিক খরচ কমানোর টিপস জানতে চান?"
+        ]
+    },
+    'banking': {
+        'english': [
+            "Would you like me to guide you through the bank account opening process?",
+            "Should I explain different types of bank accounts available?",
+            "Would you like to know about required documents for banking?"
+        ],
+        'hindi': [
+            "क्या आप चाहेंगे कि मैं बैंक खाता खोलने की प्रक्रिया बताऊं?",
+            "क्या मुझे विभिन्न प्रकार के उपलब्ध बैंक खातों के बारे में समझाना चाहिए?",
+            "क्या आप बैंकिंग के लिए आवश्यक दस्तावेजों के बारे में जानना चाहेंगे?"
+        ],
+        'bengali': [
+            "আপনি কি চান যে আমি ব্যাংক অ্যাকাউন্ট খোলার প্রক্রিয়া গাইড করি?",
+            "আমি কি বিভিন্ন ধরনের উপলব্ধ ব্যাংক অ্যাকাউন্ট ব্যাখ্যা করব?",
+            "আপনি কি ব্যাংকিংয়ের জন্য প্রয়োজনীয় নথি সম্পর্কে জানতে চান?"
+        ]
+    },
+    'loans': {
+        'english': [
+            "Would you like me to explain different types of loans available?",
+            "Should I help you understand loan eligibility criteria?",
+            "Would you like tips on improving your credit score?"
+        ],
+        'hindi': [
+            "क्या आप चाहेंगे कि मैं विभिन्न प्रकार के उपलब्ध लोन के बारे में बताऊं?",
+            "क्या मैं आपको लोन पात्रता मानदंड समझाने में मदद करूं?",
+            "क्या आप अपना क्रेडिट स्कोर सुधारने के तरीके जानना चाहेंगे?"
+        ],
+        'bengali': [
+            "আপনি কি চান যে আমি বিভিন্ন ধরনের উপলব্ধ লোন সম্পর্কে বলি?",
+            "আমি কি আপনাকে লোনের যোগ্যতার মানদণ্ড বুঝতে সাহায্য করব?",
+            "আপনি কি আপনার ক্রেডিট স্কোর উন্নত করার টিপস চান?"
+        ]
+    },
+    'insurance': {
+        'english': [
+            "Would you like me to explain different insurance types?",
+            "Should I help you calculate insurance coverage needed?",
+            "Would you like to know about government insurance schemes?"
+        ],
+        'hindi': [
+            "क्या आप चाहेंगे कि मैं विभिन्न बीमा प्रकारों के बारे में बताऊं?",
+            "क्या मैं आपको आवश्यक बीमा कवरेज की गणना करने में मदद करूं?",
+            "क्या आप सरकारी बीमा योजनाओं के बारे में जानना चाहेंगे?"
+        ],
+        'bengali': [
+            "আপনি কি চান যে আমি বিভিন্ন বীমার ধরন ব্যাখ্যা করি?",
+            "আমি কি আপনাকে প্রয়োজনীয় বীমা কভারেজ গণনা করতে সাহায্য করব?",
+            "আপনি কি সরকারি বীমা স্কিম সম্পর্কে জানতে চান?"
+        ]
+    }
+}
+
+def detect_scam_patterns(message):
+    """Detect potential scam patterns in user message"""
+    for pattern in SCAM_PATTERNS:
+        if re.search(pattern, message):
+            return True
+    return False
+
+def get_proactive_suggestions(message):
+    """Get relevant proactive suggestions based on user message"""
+    message_lower = message.lower()
+    
+    # English + Hindi + Bengali keywords for each category
+    savings_keywords = ['save', 'saving', 'money', 'बचत', 'पैसे', 'बचाना', 'টাকা', 'সাশ্রয়']
+    banking_keywords = ['bank', 'account', 'banking', 'बैंक', 'खाता', 'बैंकिंग', 'ব্যাংক', 'অ্যাকাউন্ট']
+    loan_keywords = ['loan', 'borrow', 'credit', 'लोन', 'उधार', 'ऋण', 'লোন', 'ঋণ']
+    insurance_keywords = ['insurance', 'policy', 'coverage', 'बीमा', 'पॉलिसी', 'বীমা', 'পলিসি']
+    
+    if any(word in message_lower for word in savings_keywords):
+        return 'savings'
+    elif any(word in message_lower for word in banking_keywords):
+        return 'banking'
+    elif any(word in message_lower for word in loan_keywords):
+        return 'loans'
+    elif any(word in message_lower for word in insurance_keywords):
+        return 'insurance'
+    
+    return None
+
 @app.route('/chat', methods=['POST'])
 def chat():
     try:
@@ -66,44 +170,86 @@ def chat():
         user_message = data.get('message', '')
         language = data.get('language', 'english')
         
+        # Check for scam patterns
+        scam_detected = detect_scam_patterns(user_message)
+        
+        if scam_detected:
+            scam_warning = """
+⚠️ **SCAM ALERT** ⚠️
+
+I detected something that might be a scam attempt. Please remember:
+
+🔒 **Never share your OTP, PIN, or passwords**
+💳 **Banks never ask for card details over phone/message**
+💰 **Be careful of "guaranteed returns" or "easy money" schemes**
+📱 **Don't click suspicious links or download unknown apps**
+
+If someone is pressuring you for money or personal information, please contact your bank directly or local authorities.
+
+Now, how can I help you with legitimate financial advice?
+            """
+            
+            return jsonify({
+                'response': scam_warning,
+                'scam_detected': True,
+                'status': 'success'
+            })
+        
+        # Get proactive suggestions with language awareness
+        suggestions = []
+        suggestion_category = get_proactive_suggestions(user_message)
+        
+        if suggestion_category:
+            # Get language-specific suggestions
+            if language in PROACTIVE_SUGGESTIONS[suggestion_category]:
+                suggestions = PROACTIVE_SUGGESTIONS[suggestion_category][language][:2]
+            else:
+                suggestions = PROACTIVE_SUGGESTIONS[suggestion_category]['english'][:2]
+        
         print(f"User message: {user_message}")
         print(f"Selected language: {language}")
-        
+        print(f"Suggestion category: {suggestion_category}")
+        print(f"Suggestions found: {suggestions}")
+
         # Prepare the prompt with language instruction
         language_instruction = ""
         if language.lower() == 'hindi':
             language_instruction = "Please respond in Hindi using Devanagari script. Format the response clearly with sections and bullet points. "
         elif language.lower() == 'bengali':
             language_instruction = "Please respond in Bengali. Format the response clearly with sections and bullet points. "
-            
+
         full_prompt = f"{SYSTEM_PROMPT}\n\nUser: {user_message}\n\n{language_instruction}Assistant: "
+
         print(f"Sending prompt to Gemini API using model: {model._model_name}")
-        
+
         max_retries = 3
         retry_count = 0
+
         while retry_count < max_retries:
             try:
                 # Generate response using Gemini
                 response = model.generate_content(full_prompt)
                 print(f"Received response from Gemini API: {response.text}")
+
                 return jsonify({
                     'response': response.text,
+                    'suggestions': suggestions,  # Language-specific suggestions
                     'status': 'success'
                 })
+
             except Exception as retry_error:
                 if '429' in str(retry_error) and retry_count < max_retries - 1:
                     retry_count += 1
                     print(f"Rate limit hit, waiting 60 seconds before retry {retry_count}")
-                    time.sleep(60)  # Wait for 60 seconds before retrying
+                    time.sleep(60)
                 else:
                     raise retry_error
-        
+
     except Exception as e:
         error_traceback = traceback.format_exc()
         print(f"Error occurred: {str(e)}")
         print(f"Traceback: {error_traceback}")
-        
-        # Check if it's a rate limit error
+
         if '429' in str(e):
             return jsonify({
                 'error': 'Rate limit exceeded. Please try again in a minute.',
@@ -116,5 +262,41 @@ def chat():
                 'status': 'error'
             }), 500
 
+@app.route('/common-questions', methods=['GET'])
+def get_common_questions():
+    questions = {
+        'english': [
+            "How to save money effectively?",
+            "How to open a bank account?",
+            "What is a fixed deposit?",
+            "How to apply for a loan?",
+            "What is insurance and why do I need it?",
+            "How to use UPI payments?",
+            "What are government schemes for farmers?",
+            "How to invest small amounts?"
+        ],
+        'hindi': [
+            "पैसे कैसे बचाएं?",
+            "बैंक खाता कैसे खोलें?",
+            "फिक्स्ड डिपॉजिट क्या है?",
+            "लोन के लिए आवेदन कैसे करें?",
+            "बीमा क्या है और क्यों जरूरी है?",
+            "UPI पेमेंट कैसे करें?",
+            "किसानों के लिए सरकारी योजनाएं",
+            "कम पैसे में निवेश कैसे करें?"
+        ],
+        'bengali': [
+            "কিভাবে টাকা সাশ্রয় করবেন?",
+            "ব্যাংক অ্যাকাউন্ট কিভাবে খুলবেন?",
+            "ফিক্সড ডিপোজিট কি?",
+            "লোনের জন্য আবেদন কিভাবে করবেন?",
+            "বীমা কি এবং কেন প্রয়োজন?",
+            "UPI পেমেন্ট কিভাবে করবেন?",
+            "কৃষকদের জন্য সরকারি প্রকল্প",
+            "অল্প টাকায় বিনিয়োগ কিভাবে করবেন?"
+        ]
+    }
+    return jsonify(questions)
+
 if __name__ == '__main__':
-    app.run(debug=True) 
+    app.run(debug=True)
