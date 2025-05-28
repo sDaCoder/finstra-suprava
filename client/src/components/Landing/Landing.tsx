@@ -16,6 +16,7 @@ const Landing2: React.FC = () => {
         <DemoSection />
         <AlertSection />
         <Footer />
+        <div id='chatbot' className="p-10 rounded-full bg-green-700 hover:bg-green-600 fixed bottom-10 right-10 cursor-pointer"></div>
       </div>
     </>
   );

@@ -11,7 +11,7 @@ const HeroSection: React.FC = () => {
                         With Finstra, you can navigate finance in a more intelligent and secure way.
                     </span>
                 </h1>
-                <p className="text-gray-700">
+                <p className="text-gray-400">
                     Finstra aims to provide uncomplicated, transparent, and reliable financial advice to millions of farmers.
                     This assistance helps them comprehend schemes such as KCC, safeguard against fraud, and make assured choices
                     regarding savings and investments.
