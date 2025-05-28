@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { MessageCircleMore } from "lucide-react";
+import Footer from "@/components/Footer/Footer";
+import Navbar from "@/components/Navbar/Navbar";
+import Link from "next/link";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,9 +29,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`
+          ${geistSans.variable} ${geistMono.variable} antialiased max-w-screen-xl mx-auto px-4
+        `}
       >
+        <Navbar />
         {children}
+        <Link href={"/chat"} id='chatbot' className="p-6 rounded-full bg-green-700 hover:bg-green-600 fixed bottom-10 right-10 cursor-pointer">
+          <MessageCircleMore className="text-white font-extrabold" size={28} />
+        </Link>
+        <Footer />
       </body>
     </html>
   );
