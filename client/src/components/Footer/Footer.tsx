@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import React from 'react'
 
 const Footer: React.FC = () => {
@@ -9,28 +10,28 @@ const Footer: React.FC = () => {
                     <div>
                         <h4 className="font-bold text-lg mb-2">Company</h4>
                         <ul className="space-y-1">
-                            <li><a href="#" className="hover:text-green-600">About us</a></li>
-                            <li><a href="#" className="hover:text-green-600">Our services</a></li>
-                            <li><a href="#" className="hover:text-green-600">Privacy policy</a></li>
-                            <li><a href="#" className="hover:text-green-600">Affiliate program</a></li>
+                            <li><Link href="#" className="hover:text-green-600">About us</Link></li>
+                            <li><Link href="#" className="hover:text-green-600">Our services</Link></li>
+                            <li><Link href="#" className="hover:text-green-600">Privacy policy</Link></li>
+                            <li><Link href="#" className="hover:text-green-600">Affiliate program</Link></li>
                         </ul>
                     </div>
                     <div>
                         <h4 className="font-bold text-lg mb-2">Get Help</h4>
                         <ul className="space-y-1">
-                            <li><a href="#" className="hover:text-green-600">FAQ</a></li>
-                            <li><a href="#" className="hover:text-green-600">Contact us</a></li>
-                            <li><a href="#" className="hover:text-green-600">Team</a></li>
-                            <li><a href="#" className="hover:text-green-600">Developer</a></li>
+                            <li><Link href="#" className="hover:text-green-600">FAQ</Link></li>
+                            <li><Link href="#" className="hover:text-green-600">Contact us</Link></li>
+                            <li><Link href="#" className="hover:text-green-600">Team</Link></li>
+                            <li><Link href="#" className="hover:text-green-600">Developer</Link></li>
                         </ul>
                     </div>
                     <div>
                         <h4 className="font-bold text-lg mb-2">Follow Us</h4>
                         <div className="flex space-x-4">
-                            <a href="#" className="text-xl hover:text-green-600"><i className="fab fa-facebook-f"></i></a>
-                            <a href="#" className="text-xl hover:text-green-600"><i className="fab fa-twitter"></i></a>
-                            <a href="#" className="text-xl hover:text-green-600"><i className="fab fa-instagram"></i></a>
-                            <a href="#" className="text-xl hover:text-green-600"><i className="fab fa-linkedin-in"></i></a>
+                            <Link href="#" className="text-xl hover:text-green-600"><i className="fab fa-facebook-f"></i></Link>
+                            <Link href="#" className="text-xl hover:text-green-600"><i className="fab fa-twitter"></i></Link>
+                            <Link href="#" className="text-xl hover:text-green-600"><i className="fab fa-instagram"></i></Link>
+                            <Link href="#" className="text-xl hover:text-green-600"><i className="fab fa-linkedin-in"></i></Link>
                         </div>
                     </div>
                 </div>

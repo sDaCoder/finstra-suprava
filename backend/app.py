@@ -56,7 +56,7 @@ Be encouraging and kind. Avoid jargon. Use examples from farming, livestock, or 
 Keep paragraphs short and use line breaks between sections for better readability.
 """
 
-@app.route('/chat', methods=['POST'])
+@app.route('/api/py/chat', methods=['POST'])
 def chat():
     try:
         print("Received chat request")

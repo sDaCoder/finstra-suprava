@@ -3,6 +3,7 @@ import React from 'react'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui/card'
 import { Button } from '../ui/button'
 import { useRouter } from 'next/navigation'
+import { Marquee } from '../magicui/marquee'
 
 interface CardProps {
     title: string
@@ -25,67 +26,93 @@ const FinanceTopics: React.FC = () => {
                 "Issued by banks and cooperatives"
             ]
         },
+        // {
+        //     title: "Understanding Interest",
+        //     description: "There are two types of interest:",
+        //     list: [
+        //         "Simple Interest",
+        //         "Compound Interest",
+        //         "Tip: Avoid high-interest loans."
+        //     ]
+        // },
+        // {
+        //     title: "Crop Insurance (PMFBY)",
+        //     description: "Protects crops against droughts, floods, and pests.",
+        //     list: [
+        //         "Low premium",
+        //         "Govt shares the cost",
+        //         "Claims to bank account"
+        //     ]
+        // },
+        // {
+        //     title: "Loan vs Grant",
+        //     description: "",
+        //     list: [
+        //         "Loan – repaid with interest",
+        //         "Grant – financial help not repaid"
+        //     ]
+        // },
+        // {
+        //     title: "Avoiding Financial Scams",
+        //     description: "",
+        //     list: [
+        //         "Never share OTPs or PINs",
+        //         "Don’t trust unknown KYC calls",
+        //         "Verify scheme details"
+        //     ]
+        // }
         {
-            title: "Kissan Credit Card(KCC)",
-            description: "The KCC is a government-backed scheme that provides farmers with short-term loans at low interest.",
+            title: "Understanding Interest",
+            description:
+                "Understanding how interest works helps you make smarter borrowing and saving decisions. There are two main types:",
             list: [
-                "Easy loan access without paperwork",
-                "Interest subvention (up to 4%)",
-                "For crops, livestock, and equipment",
-                "Issued by banks and cooperatives"
+                "Simple Interest – calculated on the principal amount only",
+                "Compound Interest – interest on principal plus accumulated interest",
+                "Tip: Prefer low-interest or subsidized loans"
             ]
         },
         {
-            title: "Kissan Credit Card(KCC)",
-            description: "The KCC is a government-backed scheme that provides farmers with short-term loans at low interest.",
+            title: "Crop Insurance (PMFBY)",
+            description:
+                "Pradhan Mantri Fasal Bima Yojana (PMFBY) provides insurance to farmers against crop loss due to natural calamities like drought, floods, pests, or unseasonal rains.",
             list: [
-                "Easy loan access without paperwork",
-                "Interest subvention (up to 4%)",
-                "For crops, livestock, and equipment",
-                "Issued by banks and cooperatives"
+                "Low premium with government subsidy",
+                "Protects against natural disasters and pests",
+                "Claims credited directly to your bank account"
             ]
         },
         {
-            title: "Kissan Credit Card(KCC)",
-            description: "The KCC is a government-backed scheme that provides farmers with short-term loans at low interest.",
+            title: "Loan vs Grant",
+            description:
+                "Knowing the difference between a loan and a grant helps you avoid unnecessary financial burden. Here's a breakdown:",
             list: [
-                "Easy loan access without paperwork",
-                "Interest subvention (up to 4%)",
-                "For crops, livestock, and equipment",
-                "Issued by banks and cooperatives"
+                "Loan – must be repaid with interest",
+                "Grant – financial aid, no repayment needed",
+                "Use grants for education, startups, or emergencies"
             ]
         },
         {
-            title: "Kissan Credit Card(KCC)",
-            description: "The KCC is a government-backed scheme that provides farmers with short-term loans at low interest.",
+            title: "Avoiding Financial Scams",
+            description:
+                "Scammers often target people unfamiliar with digital or banking processes. Here’s how to stay safe:",
             list: [
-                "Easy loan access without paperwork",
-                "Interest subvention (up to 4%)",
-                "For crops, livestock, and equipment",
-                "Issued by banks and cooperatives"
+                "Never share OTPs, PINs, or passwords",
+                "Ignore unknown calls asking for KYC or personal info",
+                "Verify schemes through official government websites"
             ]
-        },
-        {
-            title: "Kissan Credit Card(KCC)",
-            description: "The KCC is a government-backed scheme that provides farmers with short-term loans at low interest.",
-            list: [
-                "Easy loan access without paperwork",
-                "Interest subvention (up to 4%)",
-                "For crops, livestock, and equipment",
-                "Issued by banks and cooperatives"
-            ]
-        },
+        }
     ]
 
+    const firstRow = financialTopics.slice(0, financialTopics.length / 2);
+    const secondRow = financialTopics.slice(financialTopics.length / 2);
 
     return (
         <>
             <div className="text-3xl font-semibold text-center my-10">Financial Topics</div>
-            {/* <div id="basic" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"> */}
-            <div className='flex flex-wrap gap-12 justify-center items-center'>
-                {
-                    financialTopics.map((topic, index) => (
-                        <Card key={index}>
+            <div className='flex flex-col gap-12 justify-center items-center w-full overflow-hidden'>
+                <Marquee pauseOnHover className="[--duration:20s]">
+                    {firstRow.map((topic, index) => (
+                        <Card key={index} className='w-88 max-h-96'>
                             <CardHeader>
                                 <CardTitle>{topic.title}</CardTitle>
                                 <CardDescription>{topic.description}</CardDescription>
@@ -106,56 +133,33 @@ const FinanceTopics: React.FC = () => {
                             </CardFooter>
                         </Card>
                     ))
-                }
-
-                {/* <div className="bg-gray-700 p-6 rounded-lg shadow">
-                    <h2 className="font-bold text-xl mb-2">Kisan Credit Card (KCC)</h2>
-                    <p className="text-gray-400 mb-2">The KCC is a government-backed scheme that provides farmers with short-term loans at low interest.</p>
-                    <ul className="list-disc list-inside text-gray-400">
-                        <li>Easy loan access without paperwork</li>
-                        <li>Interest subvention (up to 4%)</li>
-                        <li>For crops, livestock, and equipment</li>
-                        <li>Issued by banks and cooperatives</li>
-                    </ul>
-                </div>
-
-
-                <div className="bg-gray-700 p-6 rounded-lg shadow">
-                    <h2 className="font-bold text-xl mb-2">Understanding Interest</h2>
-                    <p className="text-gray-400 mb-2">There are two types of interest:</p>
-                    <ul className="list-disc list-inside text-gray-400">
-                        <li>Simple Interest</li>
-                        <li>Compound Interest</li>
-                        <li>Tip: Avoid high-interest loans.</li>
-                    </ul>
-                </div>
-
-                <div className="bg-gray-700 p-6 rounded-lg shadow">
-                    <h2 className="font-bold text-xl mb-2">Crop Insurance (PMFBY)</h2>
-                    <p className="text-gray-400 mb-2">Protects crops against droughts, floods, and pests.</p>
-                    <ul className="list-disc list-inside text-gray-400">
-                        <li>Low premium</li>
-                        <li>Govt shares the cost</li>
-                        <li>Claims to bank account</li>
-                    </ul>
-                </div>
-
-                <div className="bg-gray-700 p-6 rounded-lg shadow">
-                    <h2 className="font-bold text-xl mb-2">Loan vs Grant</h2>
-                    <ul className="list-disc list-inside text-gray-400">
-                        <li>Loan – repaid with interest</li>
-                        <li>Grant – financial help not repaid</li>
-                    </ul>
-                </div>
-
-                <div className="bg-gray-700 p-6 rounded-lg shadow">
-                    <h2 className="font-bold text-xl mb-2">Avoiding Financial Scams</h2>
-                    <ul className="list-disc list-inside text-gray-400">
-                        <li>Never share OTPs or PINs</li>
-                        <li>Don’t trust unknown KYC calls</li>
-                        <li>Verify scheme details</li>
-                    </ul>
-                </div> */}
+                    }
+                </Marquee>
+                <Marquee pauseOnHover reverse className="[--duration:20s]">
+                    {secondRow.map((topic, index) => (
+                        <Card key={index} className='w-88 max-h-96'>
+                            <CardHeader>
+                                <CardTitle>{topic.title}</CardTitle>
+                                <CardDescription>{topic.description}</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <ul className="list-disc list-inside">
+                                    {topic.list.map((item, index) => (
+                                        <li key={index}>{item}</li>
+                                    ))}
+                                </ul>
+                            </CardContent>
+                            <CardFooter>
+                                <Button
+                                    onClick={() => router.push('/chat')}
+                                    className='w-full hover:bg-green-600 bg-green-700 cursor-pointer'
+                                >Get Started
+                                </Button>
+                            </CardFooter>
+                        </Card>
+                    ))
+                    }
+                </Marquee>
             </div>
         </>
     )
