@@ -69,6 +69,44 @@ header h1 {
     box-shadow: 0 4px 15px rgba(0,0,0,0.15);
 }
 
+/* Common Questions Section */
+.common-questions-section {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px var(--shadow-color);
+}
+
+.common-questions-section h3 {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.questions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 10px;
+}
+
+.question-btn {
+    background: var(--user-message-bg);
+    border: 2px solid var(--primary-color);
+    border-radius: 10px;
+    padding: 12px 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    text-align: left;
+}
+
+.question-btn:hover {
+    background: var(--primary-color);
+    color: white;
+    transform: translateY(-2px);
+}
+
 .chat-container {
     background: var(--chat-bg);
     border-radius: 20px;
@@ -133,6 +171,55 @@ header h1 {
 .message.bot li {
     margin-bottom: 10px;
     line-height: 1.8;
+}
+
+/* Suggestions Area */
+.suggestions-container {
+    background: #f8f9fa;
+    border-top: 1px solid #e0e0e0;
+    padding: 15px 25px;
+}
+
+.suggestions-header {
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+#suggestions-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.suggestion-btn {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 15px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.3s ease;
+}
+
+.suggestion-btn:hover {
+    background: var(--secondary-color);
+    transform: scale(1.05);
+}
+
+/* Scam Alert Styling */
+.message.scam-alert {
+    background: linear-gradient(135deg, #ffebee, #ffcdd2) !important;
+    border-left: 5px solid #f44336;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(244, 67, 54, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(244, 67, 54, 0); }
 }
 
 .input-area {
@@ -224,4 +311,49 @@ header h1 {
 @keyframes bounce {
     from { transform: translateY(0); }
     to { transform: translateY(-8px); }
-} 
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .questions-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    #suggestions-list {
+        flex-direction: column;
+    }
+    
+    .suggestion-btn {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .container {
+        margin: 10px;
+        padding: 10px;
+    }
+    
+    header h1 {
+        font-size: 2em;
+    }
+    
+    #chat-messages {
+        height: 400px;
+        padding: 20px;
+    }
+    
+    .message {
+        max-width: 95%;
+        padding: 15px;
+    }
+    
+    .input-area {
+        padding: 15px;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    #user-input {
+        margin-right: 0;
+    }
+}
