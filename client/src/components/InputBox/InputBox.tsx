@@ -1,6 +1,12 @@
+// Add type declarations for Web Speech API
+interface Window {
+    SpeechRecognition: any;
+    webkitSpeechRecognition: any;
+}
+
 import React, { useState } from 'react'
 import { Button } from '../ui/button'
-import { Send } from 'lucide-react'
+import { Send, Mic, MicOff } from 'lucide-react'
 import axios from 'axios';
 
 interface MessageType {
@@ -17,7 +23,81 @@ interface InputBoxProps {
     chatInput: string,
     setChatInput: (input: string) => void
 }
+
+type SpeechRecognitionType = any;
+
 const InputBox: React.FC<InputBoxProps> = ({ chatMessages, setChatMessages, chatInput, setChatInput }) => {
+    const [isListening, setIsListening] = useState(false);
+
+    // Voice recognition setup
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition as SpeechRecognitionType;
+    const recognition = SpeechRecognition ? new SpeechRecognition() : null;
+
+    if (recognition) {
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = 'en-US'; // You can change this based on user preference
+    }
+
+    const startListening = () => {
+        if (!recognition) {
+            alert("Speech recognition is not supported in your browser.");
+            return;
+        }
+
+        recognition.start();
+        setIsListening(true);
+
+        recognition.onresult = (event: any) => {
+            const transcript = Array.from(event.results)
+                .map((result: any) => result[0])
+                .map(result => result.transcript)
+                .join('');
+            
+            setChatInput(transcript);
+        };
+
+        recognition.onerror = (event: any) => {
+            console.error('Speech recognition error:', event.error);
+            setIsListening(false);
+        };
+
+        recognition.onend = () => {
+            setIsListening(false);
+        };
+    };
+
+    const stopListening = () => {
+        if (recognition) {
+            recognition.stop();
+            setIsListening(false);
+        }
+    };
+
+    const handleVoiceSearch = async (text: string) => {
+        try {
+            const response = await axios.post('http://127.0.0.1:5000/search', { text });
+            
+            // Create bot message with response
+            const botMessage: MessageType = {
+                sender: "bot",
+                message: response.data.response,
+                timestamp: new Date()
+            };
+
+            setChatMessages((prev: MessageType[]) => [...prev, botMessage]);
+        } catch (error) {
+            console.error("Error in voice search:", error);
+            setChatMessages((prev: MessageType[]) => [
+                ...prev,
+                {
+                    sender: "bot",
+                    message: "Sorry, I encountered an error processing your voice input. Please try again.",
+                    timestamp: new Date()
+                }
+            ]);
+        }
+    };
 
     const sendMessage = async () => {
         if (!chatInput.trim()) {
@@ -34,43 +114,43 @@ const InputBox: React.FC<InputBoxProps> = ({ chatMessages, setChatMessages, chat
 
         // Add user message
         setChatMessages((prev: MessageType[]) => [...prev, userMessage]);
-        setChatInput("");
-        // setIsLoading(true);
+        
+        // If the message came from voice input, use voice search endpoint
+        if (isListening) {
+            await handleVoiceSearch(chatInput);
+        } else {
+            // Regular chat flow
+            try {
+                const previousMessages = chatMessages.slice(-5);
+                const res = await axios.post("http://127.0.0.1:5000/api/py/chat", {
+                    message: chatInput,
+                    language: "english",
+                    chat_history: [...previousMessages, userMessage]
+                });
 
-        try {
-            // Get previous messages for context
-            const previousMessages = chatMessages.slice(-5); // Get last 5 messages
-
-            const res = await axios.post("http://127.0.0.1:5000/api/py/chat", {
-                message: chatInput,
-                language: "english",
-                chat_history: [...previousMessages, userMessage]
-            });
-
-            const botMessage: MessageType = {
-                sender: "bot",
-                message: res.data.response,
-                timestamp: new Date(),
-                suggestions: res.data.suggestions || [],
-                scam_detected: res.data.scam_detected || false
-            };
-
-            setChatMessages((prev: MessageType[]) => [...prev, botMessage]);
-        } catch (error) {
-            console.error("Error sending message:", error);
-            // Add error message to chat
-            setChatMessages((prev: MessageType[]) => [
-                ...prev,
-                {
+                const botMessage: MessageType = {
                     sender: "bot",
-                    message: "Sorry, I encountered an error. Please try again.",
-                    timestamp: new Date()
-                }
-            ]);
-        } 
-        // finally {
-        //     setIsLoading(false);
-        // }
+                    message: res.data.response,
+                    timestamp: new Date(),
+                    suggestions: res.data.suggestions || [],
+                    scam_detected: res.data.scam_detected || false
+                };
+
+                setChatMessages((prev: MessageType[]) => [...prev, botMessage]);
+            } catch (error) {
+                console.error("Error sending message:", error);
+                setChatMessages((prev: MessageType[]) => [
+                    ...prev,
+                    {
+                        sender: "bot",
+                        message: "Sorry, I encountered an error. Please try again.",
+                        timestamp: new Date()
+                    }
+                ]);
+            }
+        }
+        
+        setChatInput("");
     };
 
     return (
@@ -80,22 +160,25 @@ const InputBox: React.FC<InputBoxProps> = ({ chatMessages, setChatMessages, chat
                     className="flex-1 border rounded-lg px-3 py-2 text-black border-none outline-none"
                     value={chatInput}
                     onChange={(e) => setChatInput(e.target.value)}
-                    // onKeyDown={(e) => e.key === "Enter" && !isLoading && sendMessage()}
                     onKeyDown={(e) => e.key === "Enter" && sendMessage()}
                     placeholder="Type your message here..."
-                    // disabled={isLoading}
                 />
+                <Button
+                    onClick={isListening ? stopListening : startListening}
+                    className={`py-6 rounded-full ${isListening ? 'bg-red-500' : 'bg-blue-500'} text-white mr-2`}
+                    title={isListening ? 'Stop voice input' : 'Start voice input'}
+                >
+                    {isListening ? <MicOff /> : <Mic />}
+                </Button>
                 <Button
                     onClick={sendMessage}
                     className="bg-green-700 text-white py-6 rounded-full"
-                    // disabled={isLoading}
                 >
                     <Send />
                 </Button>
             </div>
         </>
     )
-    
 }
 
 export default InputBox

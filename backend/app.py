@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 import traceback
 import time
 import re
+import serpapi
 
 # Load environment variables
 load_dotenv()
@@ -15,6 +16,8 @@ CORS(app)
 
 # Configure Gemini API
 api_key = os.getenv('GEMINI_API_KEY')
+serpapi_key = os.getenv('Serpapi_api_key')
+
 if not api_key:
     print("WARNING: GEMINI_API_KEY not found in environment variables!")
 else:
@@ -132,6 +135,24 @@ PROACTIVE_SUGGESTIONS = {
     }
 }
 
+def search_web(query: str) -> str:
+    """Helper function to search the web using SerpAPI"""
+    params = {
+        "engine": "google",
+        "q": query,
+        "api_key": serpapi_key
+    }
+    try:
+        results = serpapi.search(params)
+        if "answer_box" in results and "snippet" in results["answer_box"]:
+            return results["answer_box"]["snippet"]
+        elif "organic_results" in results and len(results["organic_results"]) > 0:
+            return results["organic_results"][0].get("snippet", "No snippet found.")
+        else:
+            return "I searched the web but couldn't find a clear answer."
+    except Exception as e:
+        return f"Web search failed: {e}"
+
 def detect_scam_patterns(message):
     """Detect potential scam patterns in user message"""
     for pattern in SCAM_PATTERNS:
@@ -157,9 +178,50 @@ def get_proactive_suggestions(message):
         return 'loans'
     elif any(word in message_lower for word in insurance_keywords):
         return 'insurance'
-    
     return None
 
+# NEW VOICE SEARCH ENDPOINT (Converted from FastAPI)
+@app.route('/search', methods=['POST'])
+def voice_search():
+    """Voice search endpoint - converted from FastAPI to Flask"""
+    try:
+        data = request.json
+        input_text = data.get('text', '')
+        
+        realtime_keywords = ["today", "current", "latest", "now", "rate", "price", "update", "news"]
+        
+        if any(word in input_text.lower() for word in realtime_keywords):
+            web_snippet = search_web(input_text)
+            prompt = (
+                "You are Finstra, a financial strategist. Use the following real-time web result to answer the user's question:\n\n"
+                f"Web Search Result:\n{web_snippet}\n\n"
+                f"User Question:\n{input_text}\n\n"
+                "Reply in the same language and be clear and strategic."
+            )
+            try:
+                model = genai.GenerativeModel('gemini-2.0-flash')
+                response = model.generate_content(prompt)
+                return jsonify({"response": response.text})
+            except Exception as e:
+                return jsonify({"response": f"Gemini API error: {str(e)}"})
+        
+        try:
+            model = genai.GenerativeModel('gemini-2.0-flash')
+            prompt = (
+                f"You are Finstra, a multilingual financial strategist. Respond in the same language and be clear, relevant and strategic: {input_text}"
+            )
+            response = model.generate_content(prompt)
+            if response.text:
+                return jsonify({"response": response.text})
+            else:
+                return jsonify({"response": "Sorry, Gemini did not return a valid response."})
+        except Exception as e:
+            return jsonify({"response": f"Error from Gemini API: {str(e)}"})
+            
+    except Exception as e:
+        return jsonify({"response": f"Error processing voice search: {str(e)}"})
+
+# EXISTING CHATBOT ENDPOINT
 @app.route('/api/py/chat', methods=['POST'])
 def chat():
     try:
@@ -169,11 +231,10 @@ def chat():
         
         user_message = data.get('message', '')
         language = data.get('language', 'english')
-        chat_history = data.get('chat_history', [])  # Get chat history from request
+        chat_history = data.get('chat_history', [])
         
         # Check for scam patterns
         scam_detected = detect_scam_patterns(user_message)
-        
         if scam_detected:
             scam_warning = """
 ⚠️ **SCAM ALERT** ⚠️
@@ -188,8 +249,7 @@ I detected something that might be a scam attempt. Please remember:
 If someone is pressuring you for money or personal information, please contact your bank directly or local authorities.
 
 Now, how can I help you with legitimate financial advice?
-            """
-            
+"""
             return jsonify({
                 'response': scam_warning,
                 'scam_detected': True,
@@ -199,7 +259,6 @@ Now, how can I help you with legitimate financial advice?
         # Get proactive suggestions with language awareness
         suggestions = []
         suggestion_category = get_proactive_suggestions(user_message)
-        
         if suggestion_category:
             if language in PROACTIVE_SUGGESTIONS[suggestion_category]:
                 suggestions = PROACTIVE_SUGGESTIONS[suggestion_category][language][:2]
@@ -210,39 +269,39 @@ Now, how can I help you with legitimate financial advice?
         print(f"Selected language: {language}")
         print(f"Suggestion category: {suggestion_category}")
         print(f"Suggestions found: {suggestions}")
-
+        
         # Prepare conversation history for context
         conversation_context = ""
         if chat_history:
-            for msg in chat_history[-5:]:  # Include last 5 messages for context
+            for msg in chat_history[-5:]:
                 role = "User" if msg['sender'] == 'user' else "Assistant"
                 conversation_context += f"{role}: {msg['message']}\n"
-
+        
         # Prepare the prompt with language instruction and context
         language_instruction = ""
         if language.lower() == 'hindi':
             language_instruction = "Please respond in Hindi using Devanagari script. Format the response clearly with sections and bullet points. "
         elif language.lower() == 'bengali':
             language_instruction = "Please respond in Bengali. Format the response clearly with sections and bullet points. "
-
+        
         full_prompt = f"{SYSTEM_PROMPT}\n\nConversation History:\n{conversation_context}\n\nUser: {user_message}\n\n{language_instruction}Assistant: "
-
+        
         print(f"Sending prompt to Gemini API using model: {model._model_name}")
-
+        
         max_retries = 3
         retry_count = 0
-
+        
         while retry_count < max_retries:
             try:
                 response = model.generate_content(full_prompt)
                 print(f"Received response from Gemini API: {response.text}")
-
+                
                 return jsonify({
                     'response': response.text,
                     'suggestions': suggestions,
                     'status': 'success'
                 })
-
+                
             except Exception as retry_error:
                 if '429' in str(retry_error) and retry_count < max_retries - 1:
                     retry_count += 1
@@ -250,12 +309,12 @@ Now, how can I help you with legitimate financial advice?
                     time.sleep(60)
                 else:
                     raise retry_error
-
+                    
     except Exception as e:
         error_traceback = traceback.format_exc()
         print(f"Error occurred: {str(e)}")
         print(f"Traceback: {error_traceback}")
-
+        
         if '429' in str(e):
             return jsonify({
                 'error': 'Rate limit exceeded. Please try again in a minute.',
@@ -303,7 +362,6 @@ def get_common_questions():
         ]
     }
     return jsonify(questions)
-
 
 if __name__ == '__main__':
     app.run(debug=True)
