@@ -1,0 +1,78 @@
+'use client'
+import InputBox from '@/components/InputBox/InputBox'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { HandCoins } from 'lucide-react'
+import React, { useEffect, useRef, useState } from 'react'
+import Markdown from 'react-markdown'
+
+interface MessageType {
+  sender: string
+  message: string
+  timestamp: Date
+}
+
+const page: React.FC = () => {
+
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true }).replace('am', 'AM').replace('pm', 'PM');
+  }
+  const [chatMessages, setChatMessages] = useState<MessageType[]>([]);
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [chatMessages])
+
+  return (
+    <>
+      <ScrollArea>
+        <div className='bg-gray-50 md:h-[65vh] h-[68vh] max-w-[90vw] mt-6 mx-auto overflow-y-auto p-3 space-y-10 py-6 rounded shadow-xl'>
+          {chatMessages.length === 0 && (
+            <div className='flex flex-col items-center justify-center gap-6 h-[80%]'>
+              <div><HandCoins size={52} className='font-bold text-gray-700' /></div>
+              <h1 className='text-4xl font-bold text-gray-700'>How can I help you?</h1>
+            </div>
+          )}
+          {chatMessages?.map((msg, index) => (
+            <div key={index}>
+              <div className={`flex items-start gap-4 my-2 ${msg.sender === "user" ? "text-right justify-end" : "text-left justify-start"}`}>
+                {msg.sender === "bot" &&
+                  <Avatar className='hidden md:block'>
+                    <AvatarImage src="https://i.pravatar.cc/100?img=70" alt="@shadcn" />
+                    <AvatarFallback>Kissan AI</AvatarFallback>
+                  </Avatar>
+                }
+
+                <div className='flex flex-col gap-2'>
+                  <div className={`md:text-md text-sm shadow-md flex flex-col gap-y-2 max-w-[70vw] min-w-[20vw] px-6 py-4 rounded-xl ${msg.sender === "user" ? "bg-green-700 rounded-tr-none text-background" : "bg-slate-200 rounded-tl-none text-foreground"}`}>
+                    <h2 className='font-bold'>{msg.sender === "user" ? 'You' : "Finstra AI"}</h2>
+                    <Markdown>{msg.message}</Markdown>
+                  </div>
+                  <span className={`text-xs p-4 text-black ${msg.sender === "user" ? "text-background self-end" : "text-foreground self-start"}`}>
+                    {formatTime(new Date(msg.timestamp))}
+                  </span>
+                </div>
+
+                {msg.sender === "user" &&
+                  <Avatar className='hidden md:block'>
+                    <AvatarImage src={`https://i.pravatar.cc/100?img=69`} alt="@shadcn" />
+                    <AvatarFallback>{`sda`}</AvatarFallback>
+                  </Avatar>
+                }
+              </div>
+              <hr className='w-[75vw] my-8 mx-auto'></hr>
+            </div>
+          ))}
+          <div ref={messagesEndRef} ></div>
+        </div>
+      </ScrollArea>
+      <InputBox chatMessages={chatMessages} setChatMessages={setChatMessages} />
+      <div className="mt-2 md:text-[10px] text-[6px] text-muted-foreground text-center select-none">
+        <span className="text-red-500">Note: </span>
+        AI responses are generated based on the input provided and may not always be accurate.
+      </div>
+    </>
+  )
+}
+
+export default page

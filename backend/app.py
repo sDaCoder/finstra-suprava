@@ -51,6 +51,7 @@ Be encouraging and kind. Avoid jargon. Use examples from farming, livestock, or 
 Keep paragraphs short and use line breaks between sections for better readability.
 """
 
+
 # Scam detection patterns
 SCAM_PATTERNS = [
     r'(?i)(send money|transfer.*urgently|lottery.*won|prince.*nigeria|inheritance.*claim)',
@@ -160,7 +161,7 @@ def get_proactive_suggestions(message):
     
     return None
 
-@app.route('/chat', methods=['POST'])
+@app.route('/api/py/chat', methods=['POST'])
 def chat():
     try:
         print("Received chat request")
