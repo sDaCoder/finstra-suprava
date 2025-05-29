@@ -94,6 +94,7 @@ const InputBox: React.FC<InputBoxProps> = ({ chatMessages, setChatMessages }) =>
             </div>
         </>
     )
+    
 }
 
 export default InputBox

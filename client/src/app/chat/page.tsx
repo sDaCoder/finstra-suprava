@@ -185,6 +185,7 @@ const page: React.FC = () => {
       </div>
     </>
   )
+
 }
 
 export default page
