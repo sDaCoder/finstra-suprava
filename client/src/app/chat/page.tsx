@@ -18,7 +18,7 @@ interface MessageType {
   scam_detected?: boolean
 }
 
-const page: React.FC = () => {
+const Page: React.FC = () => {
   // const [suggestions, setSuggestions] = useState<string[]>([]);
   // const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -32,7 +32,7 @@ const page: React.FC = () => {
     // { sender: "user", message: "I'm doing well, thanks!", timestamp: new Date("2022-01-01T12:00:02.000Z") },
     // { sender: "bot", message: "That's great to hear! Is there anything you need help with or would you like to chat?", timestamp: new Date("2022-01-01T12:00:03.000Z") },
   ];
-  const [chatMessages, setChatMessages] = useState<MessageType[]>(chat);
+  const [chatMessages, setChatMessages] = useState<MessageType[]>(() => [...chat]);
   const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>([])
   const [chatInput, setChatInput] = useState<string>("");
   useEffect(() => {
@@ -217,4 +217,4 @@ const page: React.FC = () => {
 
 }
 
-export default page
+export default Page

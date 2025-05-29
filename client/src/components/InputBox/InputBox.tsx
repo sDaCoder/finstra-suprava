@@ -1,12 +1,12 @@
 // Add type declarations for Web Speech API
-interface Window {
-    SpeechRecognition: any;
-    webkitSpeechRecognition: any;
-}
+// interface Window {
+//     SpeechRecognition: any;
+//     webkitSpeechRecognition: any;
+// }
 
-import React, { useState } from 'react'
+import React from 'react'
 import { Button } from '../ui/button'
-import { Send, Mic, MicOff } from 'lucide-react'
+import { Send } from 'lucide-react'
 import axios, { AxiosResponse } from 'axios';
 
 interface MessageType {
@@ -19,17 +19,19 @@ interface MessageType {
 
 interface InputBoxProps {
     chatMessages: MessageType[],
-    setChatMessages: (messages: MessageType[] | any) => void,
+    // setChatMessages: (messages: MessageType[]) => void,
+    setChatMessages: React.Dispatch<React.SetStateAction<MessageType[]>>
     chatInput: string,
-    setChatInput: (input: string) => void
+    // setChatInput: (input: string) => void
+    setChatInput: React.Dispatch<React.SetStateAction<string>>
 }
 
-type SpeechRecognitionType = any;
+// type SpeechRecognitionType = any;
 
 const baseUrl = 'https://finstra-production.up.railway.app/';
 
 const InputBox: React.FC<InputBoxProps> = ({ chatMessages, setChatMessages, chatInput, setChatInput }) => {
-    const [isListening, setIsListening] = useState(false);
+    // const [isListening, setIsListening] = useState(false);
 
     // Voice recognition setup
     // const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition as SpeechRecognitionType;
@@ -117,42 +119,42 @@ const InputBox: React.FC<InputBoxProps> = ({ chatMessages, setChatMessages, chat
         };
 
         // Add user message
-        setChatMessages((prev: MessageType[]) => [...prev, userMessage]);
+        setChatMessages((prev) => [...prev, userMessage]);
         
         // If the message came from voice input, use voice search endpoint
-        if (isListening) {
-            // await handleVoiceSearch(chatInput);
-            console.log('Unable to set up the voice');
-        } else {
-            // Regular chat flow
-            try {
-                const previousMessages = chatMessages.slice(-5);
-                const res: AxiosResponse = await axios.post(`${baseUrl}/api/py/chat`, {
-                    message: chatInput,
-                    language: "english",
-                    chat_history: [...previousMessages, userMessage]
-                });
+        // if (isListening) {
+        //     // await handleVoiceSearch(chatInput);
+        //     console.log('Unable to set up the voice');
+        // } else {
+        //     // Regular chat flow
+        // }
+        try {
+            const previousMessages = chatMessages.slice(-5);
+            const res: AxiosResponse = await axios.post(`${baseUrl}/api/py/chat`, {
+                message: chatInput,
+                language: "english",
+                chat_history: [...previousMessages, userMessage]
+            });
 
-                const botMessage: MessageType = {
+            const botMessage: MessageType = {
+                sender: "bot",
+                message: res.data.response,
+                timestamp: new Date(),
+                suggestions: res.data.suggestions || [],
+                scam_detected: res.data.scam_detected || false
+            };
+
+            setChatMessages((prev) => [...prev, botMessage]);
+        } catch (error) {
+            console.error("Error sending message:", error);
+            setChatMessages((prev) => [
+                ...prev,
+                {
                     sender: "bot",
-                    message: res.data.response,
-                    timestamp: new Date(),
-                    suggestions: res.data.suggestions || [],
-                    scam_detected: res.data.scam_detected || false
-                };
-
-                setChatMessages((prev: MessageType[]) => [...prev, botMessage]);
-            } catch (error) {
-                console.error("Error sending message:", error);
-                setChatMessages((prev: MessageType[]) => [
-                    ...prev,
-                    {
-                        sender: "bot",
-                        message: "Sorry, I encountered an error. Please try again.",
-                        timestamp: new Date()
-                    }
-                ]);
-            }
+                    message: "Sorry, I encountered an error. Please try again.",
+                    timestamp: new Date()
+                }
+            ]);
         }
         
     };
