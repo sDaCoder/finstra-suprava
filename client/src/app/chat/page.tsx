@@ -48,47 +48,47 @@ const Page: React.FC = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [chatMessages])
 
-  const handleQuestionClick = async (question: string) => {
-    // Add user message
-    const userMessage = {
-      sender: "user",
-      message: question,
-      timestamp: new Date()
-    };
+  // const handleQuestionClick = async (question: string) => {
+  //   // Add user message
+  //   const userMessage = {
+  //     sender: "user",
+  //     message: question,
+  //     timestamp: new Date()
+  //   };
 
-    setChatMessages(prev => [...prev, userMessage]);
+  //   setChatMessages(prev => [...prev, userMessage]);
 
-    // setIsLoading(true);
-    try {
-      // Get previous messages for context
-      const previousMessages = chatMessages.slice(-5); // Get last 5 messages
+  //   // setIsLoading(true);
+  //   try {
+  //     // Get previous messages for context
+  //     const previousMessages = chatMessages.slice(-5); // Get last 5 messages
 
-      const res: AxiosResponse = await axios.post(`${baseUrl}/api/py/chat`, {
-        message: question,
-        language: "english",
-        chat_history: [...previousMessages, userMessage]
-      });
+  //     const res: AxiosResponse = await axios.post(`${baseUrl}/api/py/chat`, {
+  //       message: question,
+  //       language: "english",
+  //       chat_history: [...previousMessages, userMessage]
+  //     });
 
-      const botMessage: MessageType = {
-        sender: "bot",
-        message: res.data.response,
-        timestamp: new Date(),
-        suggestions: res.data.suggestions || [],
-        scam_detected: res.data.scam_detected || false
-      };
-      setChatMessages(prev => [...prev, botMessage]);
-    } catch (error) {
-      console.error("Error sending message:", error);
-      setChatMessages(prev => [...prev, {
-        sender: "bot",
-        message: "Sorry, I encountered an error. Please try again.",
-        timestamp: new Date()
-      }]);
-    }
-    // finally {
-    //   setIsLoading(false);
-    // }
-  };
+  //     const botMessage: MessageType = {
+  //       sender: "bot",
+  //       message: res.data.response,
+  //       timestamp: new Date(),
+  //       suggestions: res.data.suggestions || [],
+  //       scam_detected: res.data.scam_detected || false
+  //     };
+  //     setChatMessages(prev => [...prev, botMessage]);
+  //   } catch (error) {
+  //     console.error("Error sending message:", error);
+  //     setChatMessages(prev => [...prev, {
+  //       sender: "bot",
+  //       message: "Sorry, I encountered an error. Please try again.",
+  //       timestamp: new Date()
+  //     }]);
+  //   }
+  //   // finally {
+  //   //   setIsLoading(false);
+  //   // }
+  // };
 
   return (
     <>
