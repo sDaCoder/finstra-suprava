@@ -16,7 +16,8 @@ CORS(app)
 
 # Configure Gemini API
 api_key = os.getenv('GEMINI_API_KEY')
-serpapi_key = os.getenv('Serpapi_api_key')
+serpapi_key = os.getenv('SERPAPI_API_KEY')  # Updated env var name to standard format
+port = int(os.getenv('PORT', 5000))  # For Railway deployment
 
 if not api_key:
     print("WARNING: GEMINI_API_KEY not found in environment variables!")
@@ -364,4 +365,4 @@ def get_common_questions():
     return jsonify(questions)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=port)
