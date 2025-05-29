@@ -1,8 +1,10 @@
 'use client'
 import InputBox from '@/components/InputBox/InputBox'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { HandCoins } from 'lucide-react'
+import axios, { AxiosResponse } from 'axios'
+import { HandCoins, Plus } from 'lucide-react'
 import React, { useEffect, useRef, useState } from 'react'
 import Markdown from 'react-markdown'
 
@@ -17,7 +19,23 @@ const page: React.FC = () => {
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true }).replace('am', 'AM').replace('pm', 'PM');
   }
-  const [chatMessages, setChatMessages] = useState<MessageType[]>([]);
+
+  const chat: MessageType[] = [
+    { sender: "user", message: "Hi, how are you?", timestamp: new Date("2022-01-01T12:00:00.000Z") },
+    { sender: "bot", message: "I'm doing great, thanks for asking! How about you?", timestamp: new Date("2022-01-01T12:00:01.000Z") },
+    { sender: "user", message: "I'm doing well, thanks!", timestamp: new Date("2022-01-01T12:00:02.000Z") },
+    { sender: "bot", message: "That's great to hear! Is there anything you need help with or would you like to chat?", timestamp: new Date("2022-01-01T12:00:03.000Z") },
+  ];
+  const [chatMessages, setChatMessages] = useState<MessageType[]>(chat);
+  const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>([])
+  const [chatInput, setChatInput] = useState<string>("");
+  useEffect(() => {
+    (async () => {
+      const res: AxiosResponse = await axios.get("http://127.0.0.1:5000/api/py/common-questions")
+      setSuggestedQuestions(res.data.english)
+    })()
+  }, [])
+  
   const messagesEndRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -51,22 +69,42 @@ const page: React.FC = () => {
                   <span className={`text-xs p-4 text-black ${msg.sender === "user" ? "text-background self-end" : "text-foreground self-start"}`}>
                     {formatTime(new Date(msg.timestamp))}
                   </span>
+                  {(msg.sender === "bot" && index === chatMessages.length - 1) && (
+                    <>
+                      <h1 className='text-xs'>Suggested Questions</h1>
+                      <div className='flex flex-col justify-start items-start gap-2'>
+                        {suggestedQuestions.slice(0, 3).map((question, index) => (
+                          <div key={index} className='flex items-center gap-2'>
+                            <Button 
+                              onClick={() => setChatInput(question)}
+                              className='text-sm text-black bg-gray-200 hover:bg-gray-300 cursor-pointer p-4'
+                            >{question}</Button>
+                            {index === suggestedQuestions.slice(0, 3).length - 1 && (
+                              <Button className='rounded-2xl bg-gray-200 hover:bg-gray-300 cursor-pointer text-black'>
+                                <span>Show More</span><Plus />
+                              </Button>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </div>
 
                 {msg.sender === "user" &&
                   <Avatar className='hidden md:block'>
                     <AvatarImage src={`https://i.pravatar.cc/100?img=69`} alt="@shadcn" />
-                    <AvatarFallback>{`sda`}</AvatarFallback>
+                    <AvatarFallback>{`user`}</AvatarFallback>
                   </Avatar>
                 }
               </div>
-              <hr className='w-[75vw] my-8 mx-auto'></hr>
+              <hr className='w-[80vw] my-8 mx-auto'></hr>
             </div>
           ))}
           <div ref={messagesEndRef} ></div>
         </div>
       </ScrollArea>
-      <InputBox chatMessages={chatMessages} setChatMessages={setChatMessages} />
+      <InputBox chatMessages={chatMessages} setChatMessages={setChatMessages} chatInput={chatInput} setChatInput={setChatInput} />
       <div className="mt-2 md:text-[10px] text-[6px] text-muted-foreground text-center select-none">
         <span className="text-red-500">Note: </span>
         AI responses are generated based on the input provided and may not always be accurate.

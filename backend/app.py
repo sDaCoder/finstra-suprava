@@ -263,7 +263,7 @@ Now, how can I help you with legitimate financial advice?
                 'status': 'error'
             }), 500
 
-@app.route('/common-questions', methods=['GET'])
+@app.route('/api/py/common-questions', methods=['GET'])
 def get_common_questions():
     questions = {
         'english': [

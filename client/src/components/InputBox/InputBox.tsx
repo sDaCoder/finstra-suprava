@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Button } from '../ui/button'
 import { Send } from 'lucide-react'
-import axios, { Axios } from 'axios';
+import axios from 'axios';
 
 interface MessageType {
     sender: string
@@ -11,11 +11,12 @@ interface MessageType {
 
 interface InputBoxProps {
     chatMessages: MessageType[],
-    setChatMessages: (messages: MessageType[] | any) => void
+    setChatMessages: (messages: MessageType[] | any) => void,
+    chatInput: string,
+    setChatInput: (input: string) => void
 }
-const InputBox: React.FC<InputBoxProps> = ({ chatMessages, setChatMessages }) => {
+const InputBox: React.FC<InputBoxProps> = ({ chatMessages, setChatMessages, chatInput, setChatInput }) => {
 
-    const [chatInput, setChatInput] = useState<string>("");
     const sendMessage = async () => {
         if (!chatInput.trim()) {
             setChatInput(chatInput.trim());
