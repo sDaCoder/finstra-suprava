@@ -1,35 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Voice Search App</title>
-  <style>
-    body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
-    button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
-    #result { margin-top: 20px; font-size: 20px; color: #333; }
-  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-  <h1>Voice Search</h1>
-  <label for="language">Select Language:</label>
-  <select id="language">
-    <option value="en-US">English</option>
-    <option value="hi-IN">Hindi</option>
-    <option value="ta-IN">Tamil</option>
-    <option value="bn-IN">Bengali</option>
-    <option value="mr-IN">Marathi</option>
-    <option value="te-IN">Telugu</option>
-    <option value="kn-IN">Kannada</option>
-    <option value="gu-IN">Gujarati</option>
-    <option value="ml-IN">Malayalam</option>
-  </select>
+  <div class="w-screen h-screen mx-auto px-4 py-4 container">
+    <h1 class="text-3xl">Finstra</h1>
+    <img src="./images/ai.avif" class="w-20 h-20 object-cover rounded-full">
 
-  <button id="start-btn">Start Listening</button>
+    <div class="w-100px border-2 border-black rounded-r-lg rounded-bl-lg text-3xl mt-10 p-5">How can I help you</div>
+    <div class="absolute bottom-10 right-10 flex flex-col items-center justify-center gap-4">
+    
+    <label for="language" class="hidden">Select Language:</label>
+    <select id="language" class="hidden">
+      <option value="en-US">English</option>
+      <option value="hi-IN">Hindi</option>
+      <option value="ta-IN">Tamil</option>
+      <option value="bn-IN">Bengali</option>
+      <option value="mr-IN">Marathi</option>
+      <option value="te-IN">Telugu</option>
+      <option value="kn-IN">Kannada</option>
+      <option value="gu-IN">Gujarati</option>
+      <option value="ml-IN">Malayalam</option>
+    </select>
 
-  <div id="result">Your voice input will appear here...</div>
+    <button id="start-btn" class="p-2 rounded-xl shadow-2xl bg-blue-300 hover:bg-blue-400"><img src="./images/mic.png" class="w-10"></button>
+    </div>
+    
+    <div id="result" class="py-4">Your voice input will appear here...</div>
+  </div>
 
-  <script src="script.js"></script>
+
+
+  <script src="script.js">
+    lucide.createIcons();
+  </script>
 </body>
+
 </html>

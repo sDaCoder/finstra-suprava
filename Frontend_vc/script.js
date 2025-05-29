@@ -24,7 +24,7 @@ recognition.onresult = async (event) => {
     });
 
     const data = await res.json();
-    resultDiv.innerHTML += `<br><strong>Response:</strong> ${data.response}`;
+    resultDiv.innerHTML += `<br> <div class="response"> <strong>Response:</strong>${data.response}</div>`;
     // Try to match the input language used in recognition
     const detectedLang = recognition.lang || "en-US";
 
@@ -94,7 +94,7 @@ recognition.onresult = async (event) => {
 
     const data = await res.json();
     lastResponseText = data.response;
-    resultDiv.innerHTML += `<br><strong>Response:</strong> ${data.response}`;
+    resultDiv.innerHTML += `<br> <div class="response"> <strong>Response:</strong>${data.response}</div>`;
 
     speakText(data.response, recognition.lang);
   } catch (err) {
