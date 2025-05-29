@@ -8,23 +8,28 @@ import { HandCoins, Plus } from 'lucide-react'
 import React, { useEffect, useRef, useState } from 'react'
 import Markdown from 'react-markdown'
 
+
 interface MessageType {
   sender: string
   message: string
   timestamp: Date
+  suggestions?: string[]
+  scam_detected?: boolean
 }
 
 const page: React.FC = () => {
+  // const [suggestions, setSuggestions] = useState<string[]>([]);
+  // const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true }).replace('am', 'AM').replace('pm', 'PM');
   }
 
   const chat: MessageType[] = [
-    { sender: "user", message: "Hi, how are you?", timestamp: new Date("2022-01-01T12:00:00.000Z") },
-    { sender: "bot", message: "I'm doing great, thanks for asking! How about you?", timestamp: new Date("2022-01-01T12:00:01.000Z") },
-    { sender: "user", message: "I'm doing well, thanks!", timestamp: new Date("2022-01-01T12:00:02.000Z") },
-    { sender: "bot", message: "That's great to hear! Is there anything you need help with or would you like to chat?", timestamp: new Date("2022-01-01T12:00:03.000Z") },
+    // { sender: "user", message: "Hi, how are you?", timestamp: new Date("2022-01-01T12:00:00.000Z") },
+    // { sender: "bot", message: "I'm doing great, thanks for asking! How about you?", timestamp: new Date("2022-01-01T12:00:01.000Z") },
+    // { sender: "user", message: "I'm doing well, thanks!", timestamp: new Date("2022-01-01T12:00:02.000Z") },
+    // { sender: "bot", message: "That's great to hear! Is there anything you need help with or would you like to chat?", timestamp: new Date("2022-01-01T12:00:03.000Z") },
   ];
   const [chatMessages, setChatMessages] = useState<MessageType[]>(chat);
   const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>([])
@@ -37,20 +42,83 @@ const page: React.FC = () => {
   }, [])
   
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [chatMessages])
+
+  const handleQuestionClick = async (question: string) => {
+    // Add user message
+    const userMessage = {
+      sender: "user",
+      message: question,
+      timestamp: new Date()
+    };
+    
+    setChatMessages(prev => [...prev, userMessage]);
+
+    // setIsLoading(true);
+    try {
+      // Get previous messages for context
+      const previousMessages = chatMessages.slice(-5); // Get last 5 messages
+      
+      const res: AxiosResponse = await axios.post("http://127.0.0.1:5000/api/py/chat", {
+        message: question,
+        language: "english",
+        chat_history: [...previousMessages, userMessage]
+      });
+
+      const botMessage: MessageType = {
+        sender: "bot",
+        message: res.data.response,
+        timestamp: new Date(),
+        suggestions: res.data.suggestions || [],
+        scam_detected: res.data.scam_detected || false
+      };
+
+      setChatMessages(prev => [...prev, botMessage]);
+    } catch (error) {
+      console.error("Error sending message:", error);
+      setChatMessages(prev => [...prev, {
+        sender: "bot",
+        message: "Sorry, I encountered an error. Please try again.",
+        timestamp: new Date()
+      }]);
+    } 
+    // finally {
+    //   setIsLoading(false);
+    // }
+  };
 
   return (
     <>
       <ScrollArea>
         <div className='bg-gray-50 md:h-[65vh] h-[68vh] max-w-[90vw] mt-6 mx-auto overflow-y-auto p-3 space-y-10 py-6 rounded shadow-xl'>
           {chatMessages.length === 0 && (
-            <div className='flex flex-col items-center justify-center gap-6 h-[80%]'>
+            <div className='flex flex-col items-center justify-center gap-6'>
               <div><HandCoins size={52} className='font-bold text-gray-700' /></div>
               <h1 className='text-4xl font-bold text-gray-700'>How can I help you?</h1>
+              
+              {/* Common Questions Section */}
+              {/* <div className='w-full max-w-2xl mt-8'>
+                <h2 className='text-xl font-semibold mb-4 text-gray-700'>Common Questions</h2>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
+                  {commonQuestions.english?.map((question, index) => (
+                    <Button
+                      key={index}
+                      variant="outline"
+                      className='text-left p-3 hover:bg-green-50'
+                      onClick={() => handleQuestionClick(question)}
+                      disabled={isLoading}
+                    >
+                      {question}
+                    </Button>
+                  ))}
+                </div>
+              </div> */}
             </div>
           )}
+          
           {chatMessages?.map((msg, index) => (
             <div key={index}>
               <div className={`flex items-start gap-4 my-2 ${msg.sender === "user" ? "text-right justify-end" : "text-left justify-start"}`}>
@@ -62,9 +130,37 @@ const page: React.FC = () => {
                 }
 
                 <div className='flex flex-col gap-2'>
-                  <div className={`md:text-md text-sm shadow-md flex flex-col gap-y-2 max-w-[70vw] min-w-[20vw] px-6 py-4 rounded-xl ${msg.sender === "user" ? "bg-green-700 rounded-tr-none text-background" : "bg-slate-200 rounded-tl-none text-foreground"}`}>
+                  <div className={`md:text-md text-sm shadow-md flex flex-col gap-y-2 max-w-[60vw] min-w-[20vw] px-6 py-4 rounded-xl ${msg.sender === "user" ? "bg-green-700 rounded-tr-none text-background" : "bg-slate-200 rounded-tl-none text-foreground"}`}>
                     <h2 className='font-bold'>{msg.sender === "user" ? 'You' : "Finstra AI"}</h2>
                     <Markdown>{msg.message}</Markdown>
+                    
+                    {/* Scam Alert */}
+                    {msg.scam_detected && (
+                      <div className="mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+                        <h3 className="font-bold">⚠️ Scam Alert!</h3>
+                        <p>This message contains potential scam indicators. Please be cautious!</p>
+                      </div>
+                    )}
+                    
+                    {/* Proactive Suggestions */}
+                    {/* {msg.suggestions && msg.suggestions.length > 0 && (
+                      <div className="mt-4">
+                        <h3 className="font-semibold text-gray-700">You might also want to know:</h3>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {msg.suggestions.map((suggestion, idx) => (
+                            <Button
+                              key={idx}
+                              variant="outline"
+                              size="sm"
+                              className="text-sm"
+                              onClick={() => handleQuestionClick(suggestion)}
+                            >
+                              {suggestion}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+                    )} */}
                   </div>
                   <span className={`text-xs p-4 text-black ${msg.sender === "user" ? "text-background self-end" : "text-foreground self-start"}`}>
                     {formatTime(new Date(msg.timestamp))}
@@ -104,13 +200,19 @@ const page: React.FC = () => {
           <div ref={messagesEndRef} ></div>
         </div>
       </ScrollArea>
-      <InputBox chatMessages={chatMessages} setChatMessages={setChatMessages} chatInput={chatInput} setChatInput={setChatInput} />
+      <InputBox 
+        chatMessages={chatMessages} 
+        setChatMessages={setChatMessages} 
+        chatInput={chatInput} 
+        setChatInput={setChatInput} 
+      />
       <div className="mt-2 md:text-[10px] text-[6px] text-muted-foreground text-center select-none">
         <span className="text-red-500">Note: </span>
         AI responses are generated based on the input provided and may not always be accurate.
       </div>
     </>
   )
+
 }
 
 export default page

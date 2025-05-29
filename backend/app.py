@@ -51,7 +51,6 @@ Be encouraging and kind. Avoid jargon. Use examples from farming, livestock, or 
 Keep paragraphs short and use line breaks between sections for better readability.
 """
 
-
 # Scam detection patterns
 SCAM_PATTERNS = [
     r'(?i)(send money|transfer.*urgently|lottery.*won|prince.*nigeria|inheritance.*claim)',
@@ -170,6 +169,7 @@ def chat():
         
         user_message = data.get('message', '')
         language = data.get('language', 'english')
+        chat_history = data.get('chat_history', [])  # Get chat history from request
         
         # Check for scam patterns
         scam_detected = detect_scam_patterns(user_message)
@@ -201,7 +201,6 @@ Now, how can I help you with legitimate financial advice?
         suggestion_category = get_proactive_suggestions(user_message)
         
         if suggestion_category:
-            # Get language-specific suggestions
             if language in PROACTIVE_SUGGESTIONS[suggestion_category]:
                 suggestions = PROACTIVE_SUGGESTIONS[suggestion_category][language][:2]
             else:
@@ -212,14 +211,21 @@ Now, how can I help you with legitimate financial advice?
         print(f"Suggestion category: {suggestion_category}")
         print(f"Suggestions found: {suggestions}")
 
-        # Prepare the prompt with language instruction
+        # Prepare conversation history for context
+        conversation_context = ""
+        if chat_history:
+            for msg in chat_history[-5:]:  # Include last 5 messages for context
+                role = "User" if msg['sender'] == 'user' else "Assistant"
+                conversation_context += f"{role}: {msg['message']}\n"
+
+        # Prepare the prompt with language instruction and context
         language_instruction = ""
         if language.lower() == 'hindi':
             language_instruction = "Please respond in Hindi using Devanagari script. Format the response clearly with sections and bullet points. "
         elif language.lower() == 'bengali':
             language_instruction = "Please respond in Bengali. Format the response clearly with sections and bullet points. "
 
-        full_prompt = f"{SYSTEM_PROMPT}\n\nUser: {user_message}\n\n{language_instruction}Assistant: "
+        full_prompt = f"{SYSTEM_PROMPT}\n\nConversation History:\n{conversation_context}\n\nUser: {user_message}\n\n{language_instruction}Assistant: "
 
         print(f"Sending prompt to Gemini API using model: {model._model_name}")
 
@@ -228,13 +234,12 @@ Now, how can I help you with legitimate financial advice?
 
         while retry_count < max_retries:
             try:
-                # Generate response using Gemini
                 response = model.generate_content(full_prompt)
                 print(f"Received response from Gemini API: {response.text}")
 
                 return jsonify({
                     'response': response.text,
-                    'suggestions': suggestions,  # Language-specific suggestions
+                    'suggestions': suggestions,
                     'status': 'success'
                 })
 
@@ -298,6 +303,7 @@ def get_common_questions():
         ]
     }
     return jsonify(questions)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
