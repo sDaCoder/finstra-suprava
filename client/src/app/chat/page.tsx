@@ -8,6 +8,7 @@ import { HandCoins, Plus } from 'lucide-react'
 import React, { useEffect, useRef, useState } from 'react'
 import Markdown from 'react-markdown'
 
+const baseUrl = 'https://finstra-production.up.railway.app/';
 
 interface MessageType {
   sender: string
@@ -36,7 +37,7 @@ const page: React.FC = () => {
   const [chatInput, setChatInput] = useState<string>("");
   useEffect(() => {
     (async () => {
-      const res: AxiosResponse = await axios.get("http://127.0.0.1:5000/api/py/common-questions")
+      const res: AxiosResponse = await axios.get(`${baseUrl}/api/py/common-questions`)
       setSuggestedQuestions(res.data.english)
     })()
   }, [])
@@ -62,7 +63,7 @@ const page: React.FC = () => {
       // Get previous messages for context
       const previousMessages = chatMessages.slice(-5); // Get last 5 messages
 
-      const res: AxiosResponse = await axios.post("http://127.0.0.1:5000/api/py/chat", {
+      const res: AxiosResponse = await axios.post(`${baseUrl}/api/py/chat`, {
         message: question,
         language: "english",
         chat_history: [...previousMessages, userMessage]

@@ -1,3 +1,5 @@
+// const baseUrl = 'http://127.0.0.1:5000';
+const baseUrl = 'https://finstra-production.up.railway.app/';
 const startBtn = document.getElementById('start-btn');
 const resultDiv = document.getElementById('result');
 const languageSelect = document.getElementById("language");
@@ -17,7 +19,7 @@ recognition.onresult = async (event) => {
   resultDiv.textContent = `You said: "${transcript}"`;
 
   try {
-    const res = await fetch("http://127.0.0.1:5000/api/py/search", {
+    const res = await fetch(`${baseUrl}/api/py/search`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text: transcript })
@@ -86,7 +88,7 @@ recognition.onresult = async (event) => {
   resultDiv.textContent = `You said: "${transcript}"`;
 
   try {
-    const res = await fetch("http://127.0.0.1:5000/api/py/search", {
+    const res = await fetch(`${baseUrl}/api/py/search`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text: transcript })
