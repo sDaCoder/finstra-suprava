@@ -165,14 +165,14 @@ const InputBox: React.FC<InputBoxProps> = ({ chatMessages, setChatMessages, chat
                 />
                 <Button
                     onClick={isListening ? stopListening : startListening}
-                    className={`py-6 rounded-full ${isListening ? 'bg-red-500' : 'bg-blue-500'} text-white mr-2`}
+                    className={`py-6 rounded-full ${isListening ? 'bg-red-500' : 'bg-blue-500 hover:bg-blue-600'} text-white mr-2`}
                     title={isListening ? 'Stop voice input' : 'Start voice input'}
                 >
                     {isListening ? <MicOff /> : <Mic />}
                 </Button>
                 <Button
                     onClick={sendMessage}
-                    className="bg-green-700 text-white py-6 rounded-full"
+                    className="bg-green-700 hover:bg-green-600 text-white py-6 rounded-full"
                 >
                     <Send />
                 </Button>

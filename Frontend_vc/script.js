@@ -17,7 +17,7 @@ recognition.onresult = async (event) => {
   resultDiv.textContent = `You said: "${transcript}"`;
 
   try {
-    const res = await fetch("http://127.0.0.1:8000/search", {
+    const res = await fetch("http://127.0.0.1:5000/api/py/search", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text: transcript })
@@ -86,7 +86,7 @@ recognition.onresult = async (event) => {
   resultDiv.textContent = `You said: "${transcript}"`;
 
   try {
-    const res = await fetch("http://127.0.0.1:8000/search", {
+    const res = await fetch("http://127.0.0.1:5000/api/py/search", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text: transcript })

@@ -181,7 +181,7 @@ def get_proactive_suggestions(message):
     return None
 
 # NEW VOICE SEARCH ENDPOINT (Converted from FastAPI)
-@app.route('/search', methods=['POST'])
+@app.route('/api/py/search', methods=['POST'])
 def voice_search():
     """Voice search endpoint - converted from FastAPI to Flask"""
     try:

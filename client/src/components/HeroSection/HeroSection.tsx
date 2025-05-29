@@ -22,11 +22,15 @@ const HeroSection: React.FC = () => {
                         This assistance helps them comprehend schemes such as KCC, safeguard against fraud, and make assured choices
                         regarding savings and investments.
                     </p>
-                    <div className='my-4'>
+                    <div className='my-4 flex gap-4'>
                         <Button
                             onClick={() => router.push("/chat")}
                             className='cursor-pointer bg-green-700 hover:bg-green-600'
                         >Get Started</Button>
+                        <Button
+                            onClick={() => window.open('http://127.0.0.1:3000/Frontend_vc/index.html', '_blank')}
+                            className='cursor-pointer bg-green-700 hover:bg-green-600'
+                        >Get Started with Voice Chat</Button>
                     </div>
                 </div>
                 <div className="lg:w-1/2">
