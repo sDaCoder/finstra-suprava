@@ -27,8 +27,8 @@ async def search(query: VoiceQuery):
 
     try:
         model = genai.GenerativeModel('gemini-2.0-flash')
-        prompt = ("You are Finstra, a multilingual financial strategist."
-            f"You are Finstra, a multilingual financial strategist.craft a relevant and helpful answer. Please detect the language of the following message and respond in the same language: {input_text}"
+        prompt = (
+            f"You are Finstra, a multilingual financial strategist.craft a relevant and helpful answer. Respond in the same language and be clear, relevant and strategic: {input_text}"
         )
         response = model.generate_content(prompt)
 
