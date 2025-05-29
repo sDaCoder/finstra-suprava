@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voice Search App</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+    button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+    #result { margin-top: 20px; font-size: 20px; color: #333; }
+  </style>
+</head>
+<body>
+
+  <h1>Voice Search</h1>
+  <label for="language">Select Language:</label>
+  <select id="language">
+    <option value="en-US">English</option>
+    <option value="hi-IN">Hindi</option>
+    <option value="ta-IN">Tamil</option>
+    <option value="bn-IN">Bengali</option>
+    <option value="mr-IN">Marathi</option>
+    <option value="te-IN">Telugu</option>
+    <option value="kn-IN">Kannada</option>
+    <option value="gu-IN">Gujarati</option>
+    <option value="ml-IN">Malayalam</option>
+  </select>
+
+  <button id="start-btn">Start Listening</button>
+
+  <div id="result">Your voice input will appear here...</div>
+
+  <script src="script.js"></script>
+</body>
+</html>
