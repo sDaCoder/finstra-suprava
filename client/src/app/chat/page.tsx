@@ -40,9 +40,9 @@ const page: React.FC = () => {
       setSuggestedQuestions(res.data.english)
     })()
   }, [])
-  
+
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [chatMessages])
@@ -54,14 +54,14 @@ const page: React.FC = () => {
       message: question,
       timestamp: new Date()
     };
-    
+
     setChatMessages(prev => [...prev, userMessage]);
 
     // setIsLoading(true);
     try {
       // Get previous messages for context
       const previousMessages = chatMessages.slice(-5); // Get last 5 messages
-      
+
       const res: AxiosResponse = await axios.post("http://127.0.0.1:5000/api/py/chat", {
         message: question,
         language: "english",
@@ -75,7 +75,6 @@ const page: React.FC = () => {
         suggestions: res.data.suggestions || [],
         scam_detected: res.data.scam_detected || false
       };
-
       setChatMessages(prev => [...prev, botMessage]);
     } catch (error) {
       console.error("Error sending message:", error);
@@ -84,7 +83,7 @@ const page: React.FC = () => {
         message: "Sorry, I encountered an error. Please try again.",
         timestamp: new Date()
       }]);
-    } 
+    }
     // finally {
     //   setIsLoading(false);
     // }
@@ -98,27 +97,29 @@ const page: React.FC = () => {
             <div className='flex flex-col items-center justify-center gap-6'>
               <div><HandCoins size={52} className='font-bold text-gray-700' /></div>
               <h1 className='text-4xl font-bold text-gray-700'>How can I help you?</h1>
-              
+
               {/* Common Questions Section */}
-              {/* <div className='w-full max-w-2xl mt-8'>
-                <h2 className='text-xl font-semibold mb-4 text-gray-700'>Common Questions</h2>
-                <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
-                  {commonQuestions.english?.map((question, index) => (
-                    <Button
-                      key={index}
-                      variant="outline"
-                      className='text-left p-3 hover:bg-green-50'
-                      onClick={() => handleQuestionClick(question)}
-                      disabled={isLoading}
-                    >
-                      {question}
-                    </Button>
+              <div className='w-full max-w-2xl mt-8'>
+                <h2 className='text-xl text-center font-semibold mb-4 text-gray-700'>Common Questions</h2>
+                <div className='flex flex-col items-center gap-3'>
+                  {suggestedQuestions.slice(0, 3).map((question, index) => (
+                    <div key={index} className='flex items-center gap-2'>
+                      <Button
+                        onClick={() => setChatInput(question)}
+                        className='text-sm text-black bg-gray-200 hover:bg-gray-300 cursor-pointer p-4'
+                      >{question}</Button>
+                      {index === suggestedQuestions.slice(0, 3).length - 1 && (
+                        <Button className='bg-gray-200 hover:bg-gray-300 cursor-pointer text-black'>
+                          <span>Show More</span><Plus />
+                        </Button>
+                      )}
+                    </div>
                   ))}
                 </div>
-              </div> */}
+              </div>
             </div>
           )}
-          
+
           {chatMessages?.map((msg, index) => (
             <div key={index}>
               <div className={`flex items-start gap-4 my-2 ${msg.sender === "user" ? "text-right justify-end" : "text-left justify-start"}`}>
@@ -133,7 +134,7 @@ const page: React.FC = () => {
                   <div className={`md:text-md text-sm shadow-md flex flex-col gap-y-2 max-w-[60vw] min-w-[20vw] px-6 py-4 rounded-xl ${msg.sender === "user" ? "bg-green-700 rounded-tr-none text-background" : "bg-slate-200 rounded-tl-none text-foreground"}`}>
                     <h2 className='font-bold'>{msg.sender === "user" ? 'You' : "Finstra AI"}</h2>
                     <Markdown>{msg.message}</Markdown>
-                    
+
                     {/* Scam Alert */}
                     {msg.scam_detected && (
                       <div className="mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
@@ -141,7 +142,7 @@ const page: React.FC = () => {
                         <p>This message contains potential scam indicators. Please be cautious!</p>
                       </div>
                     )}
-                    
+
                     {/* Proactive Suggestions */}
                     {/* {msg.suggestions && msg.suggestions.length > 0 && (
                       <div className="mt-4">
@@ -171,7 +172,7 @@ const page: React.FC = () => {
                       <div className='flex flex-col justify-start items-start gap-2'>
                         {suggestedQuestions.slice(0, 3).map((question, index) => (
                           <div key={index} className='flex items-center gap-2'>
-                            <Button 
+                            <Button
                               onClick={() => setChatInput(question)}
                               className='text-sm text-black bg-gray-200 hover:bg-gray-300 cursor-pointer p-4'
                             >{question}</Button>
@@ -200,11 +201,11 @@ const page: React.FC = () => {
           <div ref={messagesEndRef} ></div>
         </div>
       </ScrollArea>
-      <InputBox 
-        chatMessages={chatMessages} 
-        setChatMessages={setChatMessages} 
-        chatInput={chatInput} 
-        setChatInput={setChatInput} 
+      <InputBox
+        chatMessages={chatMessages}
+        setChatMessages={setChatMessages}
+        chatInput={chatInput}
+        setChatInput={setChatInput}
       />
       <div className="mt-2 md:text-[10px] text-[6px] text-muted-foreground text-center select-none">
         <span className="text-red-500">Note: </span>
