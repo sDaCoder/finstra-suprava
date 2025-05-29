@@ -128,7 +128,7 @@ const page: React.FC = () => {
                 }
 
                 <div className='flex flex-col gap-2'>
-                  <div className={`md:text-md text-sm shadow-md flex flex-col gap-y-2 max-w-[70vw] min-w-[20vw] px-6 py-4 rounded-xl ${msg.sender === "user" ? "bg-green-700 rounded-tr-none text-background" : "bg-slate-200 rounded-tl-none text-foreground"}`}>
+                  <div className={`md:text-md text-sm shadow-md flex flex-col gap-y-2 max-w-[60vw] min-w-[20vw] px-6 py-4 rounded-xl ${msg.sender === "user" ? "bg-green-700 rounded-tr-none text-background" : "bg-slate-200 rounded-tl-none text-foreground"}`}>
                     <h2 className='font-bold'>{msg.sender === "user" ? 'You' : "Finstra AI"}</h2>
                     <Markdown>{msg.message}</Markdown>
                     
@@ -172,7 +172,7 @@ const page: React.FC = () => {
                   </Avatar>
                 }
               </div>
-              <hr className='w-[75vw] my-8 mx-auto'></hr>
+              <hr className='w-[60vw] my-8 mx-auto'></hr>
             </div>
           ))}
           <div ref={messagesEndRef} ></div>
