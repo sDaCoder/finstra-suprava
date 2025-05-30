@@ -35,10 +35,12 @@ const Page: React.FC = () => {
   const [chatMessages, setChatMessages] = useState<MessageType[]>(() => [...chat]);
   const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>([])
   const [chatInput, setChatInput] = useState<string>("");
+  const [selectedLanguage, setSelectedLanguage] = useState<string>("english");
+
   useEffect(() => {
     (async () => {
       const res: AxiosResponse = await axios.get(`${baseUrl}/api/py/common-questions`)
-      setSuggestedQuestions(res.data.english)
+      setSuggestedQuestions(res.data[selectedLanguage]);
     })()
   }, [])
 
@@ -89,6 +91,11 @@ const Page: React.FC = () => {
   //   //   setIsLoading(false);
   //   // }
   // };
+
+
+  const handleLanguageChange = (language: string) => {
+    setSelectedLanguage(language);
+  };
 
   return (
     <>
@@ -207,6 +214,8 @@ const Page: React.FC = () => {
         setChatMessages={setChatMessages}
         chatInput={chatInput}
         setChatInput={setChatInput}
+        selectedLanguage={selectedLanguage}
+        handleLanguageChange={handleLanguageChange}
       />
       <div className="mt-2 md:text-[10px] text-[6px] text-muted-foreground text-center select-none">
         <span className="text-red-500">Note: </span>

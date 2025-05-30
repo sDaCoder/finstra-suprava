@@ -8,6 +8,7 @@ import React from 'react'
 import { Button } from '../ui/button'
 import { Send } from 'lucide-react'
 import axios, { AxiosResponse } from 'axios';
+import LanguageSelector from '../LanguageSelector/LanguageSelector';
 
 interface MessageType {
     sender: string
@@ -23,14 +24,17 @@ interface InputBoxProps {
     setChatMessages: React.Dispatch<React.SetStateAction<MessageType[]>>
     chatInput: string,
     // setChatInput: (input: string) => void
-    setChatInput: React.Dispatch<React.SetStateAction<string>>
+    setChatInput: React.Dispatch<React.SetStateAction<string>>,
+    selectedLanguage: string,
+    handleLanguageChange: (language: string) => void
 }
 
 // type SpeechRecognitionType = any;
 
 const baseUrl = 'https://finstra-production.up.railway.app/';
 
-const InputBox: React.FC<InputBoxProps> = ({ chatMessages, setChatMessages, chatInput, setChatInput }) => {
+const InputBox: React.FC<InputBoxProps> = ({ 
+    chatMessages, setChatMessages, chatInput, setChatInput, selectedLanguage, handleLanguageChange }) => {
     // const [isListening, setIsListening] = useState(false);
 
     // Voice recognition setup
@@ -120,7 +124,7 @@ const InputBox: React.FC<InputBoxProps> = ({ chatMessages, setChatMessages, chat
 
         // Add user message
         setChatMessages((prev) => [...prev, userMessage]);
-        
+
         // If the message came from voice input, use voice search endpoint
         // if (isListening) {
         //     // await handleVoiceSearch(chatInput);
@@ -132,7 +136,7 @@ const InputBox: React.FC<InputBoxProps> = ({ chatMessages, setChatMessages, chat
             const previousMessages = chatMessages.slice(-5);
             const res: AxiosResponse = await axios.post(`${baseUrl}/api/py/chat`, {
                 message: chatInput,
-                language: "english",
+                language: selectedLanguage,
                 chat_history: [...previousMessages, userMessage]
             });
 
@@ -156,7 +160,17 @@ const InputBox: React.FC<InputBoxProps> = ({ chatMessages, setChatMessages, chat
                 }
             ]);
         }
-        
+    };
+
+    const getPlaceholderText = () => {
+        switch (selectedLanguage) {
+            case 'hindi':
+                return "अपना संदेश यहाँ लिखें...";
+            case 'bengali':
+                return "আপনার বার্তা এখানে টাইপ করুন...";
+            default:
+                return "Type your message here...";
+        }
     };
 
     return (
@@ -167,7 +181,7 @@ const InputBox: React.FC<InputBoxProps> = ({ chatMessages, setChatMessages, chat
                     value={chatInput}
                     onChange={(e) => setChatInput(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-                    placeholder="Type your message here..."
+                    placeholder={getPlaceholderText()}
                 />
                 {/* <Button
                     onClick={isListening ? stopListening : startListening}
@@ -176,12 +190,20 @@ const InputBox: React.FC<InputBoxProps> = ({ chatMessages, setChatMessages, chat
                 >
                     {isListening ? <MicOff /> : <Mic />}
                 </Button> */}
-                <Button
-                    onClick={sendMessage}
-                    className="bg-green-700 hover:bg-green-600 text-white py-6 rounded-full"
-                >
-                    <Send />
-                </Button>
+                <div className='flex justify-center gap-x-4 items-end'>
+                    <div className="mb-2">
+                        <LanguageSelector
+                            selectedLanguage={selectedLanguage}
+                            onLanguageChange={handleLanguageChange}
+                        />
+                    </div>
+                    <Button
+                        onClick={sendMessage}
+                        className="bg-green-700 hover:bg-green-600 text-white py-6 px-4 rounded-full"
+                    >
+                        <Send />
+                    </Button>
+                </div>
             </div>
         </>
     )
